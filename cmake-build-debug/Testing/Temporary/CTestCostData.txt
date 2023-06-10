@@ -1,0 +1,4 @@
+specjalizacjaTest 1 0.0250325
+speSetTests 1 0.0193307
+specVecTests 1 0.0354944
+---
