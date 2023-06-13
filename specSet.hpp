@@ -41,7 +41,7 @@ namespace std {
 
         set() = default;
 
-        set(std::initializer_list<data_type> initializer_list) {
+        set(initializer_list<data_type> initializer_list) {
             for (const auto &i: initializer_list) {
                 insert(i);
             }
@@ -167,7 +167,7 @@ namespace std {
         }
 
         bool includes(const set<cunits<T>> &cus) const {
-            return std::ranges::all_of(cus, [this](const auto &cu) {
+            return ranges::all_of(cus, [this](const auto &cu) {
                 return this->includes(cu);
             });
         }
@@ -201,8 +201,8 @@ namespace std {
 
         // ============================= CONVERSIONS =============================
 
-        static std::set<data_type> from_vector(const std::vector<value_type> &values) {
-            std::set<data_type> result;
+        static set<data_type> from_vector(const vector<value_type> &values) {
+            set<data_type> result;
             auto first = values.begin();
             auto last = values.end();
             while (first != last) {
@@ -216,14 +216,14 @@ namespace std {
             return result;
         }
 
-        static std::set<data_type> from_set_of(const std::set<value_type> &values) {
-            auto vec = std::vector<value_type>(values.begin(), values.end());
+        static set<data_type> from_set_of(const set<value_type> &values) {
+            auto vec = vector<value_type>(values.begin(), values.end());
             auto result = from_vector(vec);
             return result;
         }
 
-        std::vector<value_type> to_vector() const {
-            std::vector<value_type> result;
+        vector<value_type> to_vector() const {
+            vector<value_type> result;
             for (const auto &cu: m_cus) {
                 for (auto value = cu.min(); value < cu.max(); ++value) {
                     result.push_back(value);
@@ -232,9 +232,9 @@ namespace std {
             return result;
         }
 
-        std::set<value_type> to_set_of() const {
+        set<value_type> to_set_of() const {
             auto vec = to_vector();
-            std::set<value_type> result(vec.begin(), vec.end());
+            set<value_type> result(vec.begin(), vec.end());
             return result;
         }
 
@@ -244,7 +244,7 @@ namespace std {
 
     template<typename T>
     bool operator==(const set<cunits<T>> &lhs, const set<cunits<T>> &rhs) {
-        return std::ranges::equal(lhs, rhs);
+        return ranges::equal(lhs, rhs);
     }
 
     template<typename T>
@@ -253,11 +253,11 @@ namespace std {
     }
 
     template<typename T>
-    std::ostream &operator<<(std::ostream &os, const set<cunits<T>> &cus) {
+    ostream &operator<<(ostream &os, const set<cunits<T>> &cus) {
         os << "{";
         for (auto it = cus.begin(); it != cus.end(); ++it) {
             os << *it;
-            if (std::next(it) != cus.end()) {
+            if (next(it) != cus.end()) {
                 os << ", ";
             }
         }
@@ -266,7 +266,7 @@ namespace std {
     }
 
     template<typename T>
-    std::istream &operator>>(std::istream &is, set<cunits<T>> &cus) {
+    istream &operator>>(istream &is, set<cunits<T>> &cus) {
         char c;
 
         is >> c;
