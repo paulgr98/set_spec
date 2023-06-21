@@ -91,6 +91,17 @@ namespace std {
             return m_cus.size();
         }
 
+        bool includes(const data_type &cu) const {
+            auto i = ranges::upper_bound(m_cus, cu, data_type_cmp());
+            return i != begin() && (--i)->includes(cu);
+        }
+
+        bool includes(const set<cunits<T>> &cus) const {
+            return ranges::all_of(cus, [this](const auto &cu) {
+                return this->includes(cu);
+            });
+        }
+
         // ============================= MODIFIERS =============================
 
         void clear() {
@@ -159,17 +170,6 @@ namespace std {
 
         void erase(const typename adapted_type::const_iterator &it) {
             erase(*it);
-        }
-
-        bool includes(const data_type &cu) const {
-            auto i = ranges::upper_bound(m_cus, cu, data_type_cmp());
-            return i != begin() && (--i)->includes(cu);
-        }
-
-        bool includes(const set<cunits<T>> &cus) const {
-            return ranges::all_of(cus, [this](const auto &cu) {
-                return this->includes(cu);
-            });
         }
 
         // ============================= LOOKUP =============================

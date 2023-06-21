@@ -7,7 +7,6 @@
 #include <algorithm>
 #include "cunits.hpp"
 
-
 namespace std {
     template<typename T>
     class set<cunits<T>> {
@@ -25,8 +24,7 @@ namespace std {
         using adapted_type = set<data_type, data_type_cmp>;
         adapted_type m_cus;
 
-        bool verify()
-        {
+        bool verify() {
             if (auto i = begin(); i != end())
                 for (auto p = i; ++i != end(); ++p)
                     if (p->max() > i->min())
@@ -36,7 +34,6 @@ namespace std {
         }
 
     public:
-
         // ============================= CONSTRUCTORS =============================
 
         set() = default;
@@ -47,13 +44,11 @@ namespace std {
             }
         }
 
-        ~set() = default;
-
         // ============================= OPERATORS =============================
 
         set &operator=(const set &) = default;
 
-        bool operator < (const set<cunits<T>> &rhs) const {
+        bool operator<(const set<cunits<T>> &rhs) const {
             return static_cast<adapted_type>(*this) < static_cast<adapted_type>(rhs);
         }
 
@@ -61,13 +56,13 @@ namespace std {
             return lhs.max() <= rhs.min();
         }
 
-        bool operator == (const set<cunits<T>> &rhs) const {
+        bool operator==(const set<cunits<T>> &rhs) const {
             if (size() != rhs.size()) {
                 return false;
             }
 
-            for(auto i = begin(), j = rhs.begin(); i != end(); ++i, ++j) {
-                if(*i != *j) {
+            for (auto i = begin(), j = rhs.begin(); i != end(); ++i, ++j) {
+                if (*i != *j) {
                     return false;
                 }
             }
@@ -95,6 +90,17 @@ namespace std {
             return m_cus.size();
         }
 
+        bool includes(const data_type &cu) const {
+            auto i = m_cus.upper_bound(cu);
+            return i != begin() && (--i)->includes(cu);
+        }
+
+        bool includes(const set<cunits<T>> &cus) const {
+            return ranges::all_of(cus, [this](const auto &cu) {
+                return this->includes(cu);
+            });
+        }
+
         // ============================= MODIFIERS =============================
 
         void clear() {
@@ -104,24 +110,23 @@ namespace std {
         void insert(const data_type &new_cu) {
             auto min = new_cu.min();
             auto max = new_cu.max();
-
-            if(min == max) {
-                return;
-            }
-
             auto i = m_cus.upper_bound(new_cu);
             auto j = i;
 
-            if(m_cus.contains(new_cu)) {
+            if (min == max) {
                 return;
             }
 
-            if(auto i2 = i; i2 != begin() && (--i2)->max() >= new_cu.min()) {
+            if (m_cus.contains(new_cu)) {
+                return;
+            }
+
+            if (auto i2 = i; i2 != begin() && (--i2)->max() >= new_cu.min()) {
                 --i;
                 min = i->min();
             }
 
-            if(j != end() && new_cu.max() >= j->min()) {
+            if (j != end() && new_cu.max() >= j->min()) {
                 max = j->max();
                 ++j;
             }
@@ -134,7 +139,7 @@ namespace std {
             assert(verify());
         }
 
-        auto erase(const data_type &new_cu) {
+        void erase(const data_type &new_cu) {
             auto i = m_cus.lower_bound(new_cu);
 
             assert(i != end());
@@ -144,12 +149,12 @@ namespace std {
 
             i = m_cus.erase(i);
 
-            if(new_cu.max() < erase_cu.max()) {
+            if (new_cu.max() < erase_cu.max()) {
                 data_type insert_cu(new_cu.max(), erase_cu.max());
                 i = m_cus.insert(i, insert_cu);
             }
 
-            if(erase_cu.min() < new_cu.min()) {
+            if (erase_cu.min() < new_cu.min()) {
                 data_type insert_cu(erase_cu.min(), new_cu.min());
                 m_cus.insert(i, insert_cu);
             }
@@ -161,17 +166,6 @@ namespace std {
             m_cus.erase(*it);
         }
 
-        bool includes(const data_type &new_cu) const {
-            auto i = m_cus.upper_bound(new_cu);
-            return i != begin() && (--i)->includes(new_cu);
-        }
-
-        bool includes(const set<cunits<T>> &cus) const {
-            return ranges::all_of(cus, [this](const auto &cu) {
-                return this->includes(cu);
-            });
-        }
-
         // ============================= LOOKUP =============================
 
         auto find(const data_type &new_cu) const {
@@ -179,7 +173,7 @@ namespace std {
             return i != begin() && (--i)->includes(new_cu) ? i : end();
         }
 
-        auto find(const value_type& value) const {
+        auto find(const value_type &value) const {
             return find(data_type(value, value + 1));
         }
 

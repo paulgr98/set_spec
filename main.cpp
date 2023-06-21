@@ -56,15 +56,45 @@ void test() {
     const bool PRINT_FOUND = false;
     // =============================--------=============================
 
+    // CLOCK INITIALIZATION TIME
+    auto start = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration_sum = (end - start);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "INITIALIZATION TIME: " << duration << " ms\n\n";
+
+    // SPECIALIZATION INSERTION TIME
+    start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < NUM_OF_CUNITS; ++i) {
         auto size = get_random_size(MAX_SINGLE_CUNIT_SIZE);
         auto cu = get_random_cunit(MAX_SINGLE_CUNIT_VALUE, size);
         range.insert(cu);
     }
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    auto spec_insert_time = duration;
 
 //    range = {{1, 100000}};
 
-    auto set = range.to_set_of();
+    auto to_insert = range.to_set_of();
+
+    // INSERTION TIME FOR STANDARD SET
+    auto set = std::set<int>{};
+    start = std::chrono::high_resolution_clock::now();
+    for (auto item: to_insert) {
+        set.insert(item);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << "SET INSERTION TIME\n";
+    std::cout << "==========================================================\n";
+    std::cout << "Time: " << duration << " ms\n\n";
+
+
+    std::cout << "SPECIALIZATION INSERTION TIME\n";
+    std::cout << "==========================================================\n";
+    std::cout << "Time: " << spec_insert_time << " ms\n\n";
 
     std::cout << "Range size: " << range.size() << '\n';
     std::cout << "Set size: " << set.size() << '\n';
@@ -74,11 +104,6 @@ void test() {
     for (int i = 0; i < NUM_OF_NUMBERS_TO_FIND; ++i) {
         numbers.push_back(get_random_number(1, MAX_RANDOM_NUMBER_TO_FIND));
     }
-
-    auto start = std::chrono::high_resolution_clock::now();
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "INITIALIZATION TIME: " << duration << " ms\n\n";
 
     // searching for random numbers in set
     int found{};
@@ -92,7 +117,7 @@ void test() {
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    std::cout << "SET\n";
+    std::cout << "SET SEARCHING TIME\n";
     std::cout << "==========================================================\n";
     std::cout <<  "Found: " << found << '\n';
     std::cout <<  "Time: " << duration << " ms\n\n";
@@ -112,12 +137,43 @@ void test() {
         }
     }
     end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>( end - start).count();
 
-    std::cout << "SPECIALIZATION\n";
+    std::cout << "SPECIALIZATION SEARCHING TIME\n";
     std::cout << "==========================================================\n";
     std::cout <<  "Found: " << found << '\n';
     std::cout <<  "Time: " << duration << " ms\n\n";
+
+    // SET DELETION TIME
+    start = std::chrono::high_resolution_clock::now();
+    for (auto item: to_insert) {
+        set.erase(item);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << "SET DELETION TIME\n";
+    std::cout << "==========================================================\n";
+    std::cout << "Time: " << duration << " ms\n\n";
+
+    // SPECIALIZATION DELETION TIME
+    start = std::chrono::high_resolution_clock::now();
+    for (auto item: to_insert) {
+        range.erase({item, item + 1});
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << "SPECIALIZATION DELETION TIME\n";
+    std::cout << "==========================================================\n";
+    std::cout << "Time: " << duration << " ms\n\n";
+
+    set.clear();
+    range.clear();
+
+    set.insert(1);
+    range.insert({1, 2});
+
 
     if (PRINT_FOUND)
         print_found<std::set>(range, numbers);
